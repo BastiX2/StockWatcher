@@ -1,0 +1,1 @@
+{"AAPL": "Apple", "ATVI": "Activision Blizzard", "BASFY": "BASF SE", "FDX": "FedEx", "NFLX": "Netflix", "NVAX": "Novavax", "PCELF": "Powercell Sweden AB", "SAP": "SAP SE", "PSMMF": "Persimmon plc", "SYIEF": "Symrise AG", "GOOG": "Alphabet Inc"}

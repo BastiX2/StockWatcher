@@ -1,9 +1,10 @@
+import concurrent.futures
 import json
 from operator import attrgetter
 
-from termcolor import colored
 import requests
-import concurrent.futures
+from termcolor import colored
+
 from model.stock import Stock
 
 # API Token and headers

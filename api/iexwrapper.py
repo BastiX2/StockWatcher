@@ -1,4 +1,6 @@
 import json
+from operator import attrgetter
+
 from termcolor import colored
 import requests
 import concurrent.futures
@@ -31,58 +33,70 @@ def get_stock(name: str, symbol: str) -> Stock:
     print(colored(f"ERROR: No stock found for: {name}({symbol})", "red"))
 
 
-def save_stocks(symbols: dict):
+def save_stocks(symbols: dict, file_path: str):
     """
     Save current stocks to file
 
+    :param file_path: File path to save the current stocks
     :param symbols: Dict of symbols to save to file.
     """
     data = json.dumps(symbols)
-    with open(FILE, "w") as file:
+    with open(file_path, "w") as file:
         file.write(data)
 
 
-def load_stocks() -> dict:
+def load_stocks(file_path: str) -> dict:
     """
     Read current stocks from file
 
+    :param file_path: Path of the file to load stocks from
     :return: Dict of stocks, empty dict if no file exist
     """
     stocks = {}
-    with open(FILE, "r") as file:
+    with open(file_path, "r") as file:
         data = file.read()
         if data:
             stocks = json.loads(data)
     return stocks
 
 
-def add_stock(name: str, symbol: str):
+def add_stock(name: str, symbol: str, file_path: str):
     """
     Add a new Stock to the file
-    :param name:
-    :param symbol:
+
+    :param name: name of the stock
+    :param symbol: Symbol of the stock
+    :param file_path: Path of the data file
     """
-    stocks = load_stocks()
+    stocks = load_stocks(file_path)
     stocks.update({name: symbol})
-    save_stocks(stocks)
+    save_stocks(stocks, file_path)
 
 
-def delete_stock(symbol: str):
+def delete_stock(symbol: str, file_path: str):
     """
     Remove the stock with the specified symbol.
 
     :param symbol: Symbol representing a stock
+    :param file_path: Path of the data file
     """
 
-    stocks = load_stocks()
+    stocks = load_stocks(file_path)
     if symbol in stocks:
         del stocks[symbol]
-        save_stocks(stocks)
+        save_stocks(stocks, file_path)
 
 
-def main():
+def get_all_stocks(file_path: str, sort_by: str = "name") -> list:
+    """
+    Get all data for the stocks in the specified file
+
+    :param file_path: Path of storage file
+    :param sort_by: Sort the stocks by specific attribute
+    :return: List of stocks
+    """
     # Get symbols from file
-    symbols = load_stocks()
+    symbols = load_stocks(file_path)
     stocks = []
     # Start the executer with MAX_WORKER workers
     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKER) as executor:
@@ -98,10 +112,6 @@ def main():
             except Exception as ex:
                 print('%r generated an exception: %s', ex)
 
-    stocks.sort(key=lambda x: x.name)
-    print(*stocks, sep="\n")
-    print()
-
-
-if __name__ == '__main__':
-    main()
+    # Sort by name
+    stocks.sort(key=attrgetter(sort_by))
+    return stocks
